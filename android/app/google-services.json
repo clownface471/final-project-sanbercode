@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "623742364391",
+    "project_id": "catatanai-final-project",
+    "storage_bucket": "catatanai-final-project.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:623742364391:android:289873ca5c9c5583939042",
+        "android_client_info": {
+          "package_name": "com.example.final_project_sanbercode"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdQ0obeOQ7tCSKEXCPrR56F36KU1wwLPk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
