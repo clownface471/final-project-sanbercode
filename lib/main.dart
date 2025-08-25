@@ -3,17 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'app/routes/app_pages.dart';
-import 'firebase_options.dart'; // File ini otomatis dibuat oleh flutterfire_cli
+import 'firebase_options.dart'; 
 
 void main() async {
-  // Pastikan semuanya siap sebelum menjalankan app
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Inisialisasi Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
   runApp(const MyApp());
 }
 
@@ -25,7 +21,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Catatan AI",
-      initialRoute: AppPages.INITIAL,
+      initialRoute: AppPages.initial, 
       getPages: AppPages.routes,
     );
   }
