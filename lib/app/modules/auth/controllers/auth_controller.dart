@@ -1,32 +1,50 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:final_project_sanbercode/app/routes/app_pages.dart';
+import '../../../data/services/firestore_service.dart';
+import '../../../routes/app_pages.dart';
 
 class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirestoreService _firestoreService = FirestoreService();
+  
+  // Controllers untuk Login
+  final loginInputController = TextEditingController();
+  final loginPasswordController = TextEditingController();
 
-  // Controllers untuk text fields
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final confirmPasswordController = TextEditingController();
+  // Controllers untuk Register
+  final registerUsernameController = TextEditingController();
+  final registerEmailController = TextEditingController();
+  final registerPasswordController = TextEditingController();
+  final registerConfirmPasswordController = TextEditingController();
 
-  // State untuk beralih antara Login dan Register
-  var isLogin = true.obs;
-  // State untuk loading
+  var isLoginView = true.obs;
   var isLoading = false.obs;
 
   Future<void> login() async {
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-      Get.snackbar("Error", "Email dan Password tidak boleh kosong.");
+    if (loginInputController.text.isEmpty || loginPasswordController.text.isEmpty) {
+      Get.snackbar("Error", "Input dan Password tidak boleh kosong.");
       return;
     }
 
     isLoading.value = true;
     try {
+      String email;
+      final userInput = loginInputController.text.trim();
+
+      if (userInput.contains('@')) {
+        email = userInput;
+      } else {
+        final foundEmail = await _firestoreService.getEmailFromUsername(userInput);
+        if (foundEmail == null) {
+          throw FirebaseAuthException(code: 'user-not-found', message: 'Username tidak ditemukan.');
+        }
+        email = foundEmail;
+      }
+
       await _auth.signInWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
+        email: email,
+        password: loginPasswordController.text.trim(),
       );
       Get.offAllNamed(Routes.HOME);
     } on FirebaseAuthException catch (e) {
@@ -37,43 +55,53 @@ class AuthController extends GetxController {
   }
 
   Future<void> register() async {
-    if (emailController.text.isEmpty ||
-        passwordController.text.isEmpty ||
-        confirmPasswordController.text.isEmpty) {
+    if (registerUsernameController.text.isEmpty ||
+        registerEmailController.text.isEmpty ||
+        registerPasswordController.text.isEmpty ||
+        registerConfirmPasswordController.text.isEmpty) {
       Get.snackbar("Error", "Semua field harus diisi.");
       return;
     }
-
-    if (passwordController.text != confirmPasswordController.text) {
+    if (registerPasswordController.text != registerConfirmPasswordController.text) {
       Get.snackbar("Error", "Password dan Konfirmasi Password tidak cocok.");
       return;
     }
-
     isLoading.value = true;
     try {
-      await _auth.createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: registerEmailController.text.trim(),
+        password: registerPasswordController.text.trim(),
       );
-      Get.snackbar("Sukses", "Akun berhasil dibuat. Silakan login.");
-      // Arahkan ke mode login setelah berhasil daftar
-      isLogin.value = true;
-      // Kosongkan field
-      passwordController.clear();
-      confirmPasswordController.clear();
 
+      if (userCredential.user != null) {
+        await _firestoreService.createUserProfile(userCredential.user!, registerUsernameController.text.trim());
+      }
+
+      Get.snackbar("Sukses", "Akun berhasil dibuat. Silakan login.");
+      isLoginView.value = true;
+      _clearRegisterFields();
     } on FirebaseAuthException catch (e) {
       Get.snackbar("Error Register", e.message ?? "Terjadi kesalahan");
     } finally {
       isLoading.value = false;
     }
   }
+  
+  void _clearRegisterFields() {
+      registerUsernameController.clear();
+      registerEmailController.clear();
+      registerPasswordController.clear();
+      registerConfirmPasswordController.clear();
+  }
 
   @override
   void onClose() {
-    emailController.dispose();
-    passwordController.dispose();
-    confirmPasswordController.dispose();
+    loginInputController.dispose();
+    loginPasswordController.dispose();
+    registerUsernameController.dispose();
+    registerEmailController.dispose();
+    registerPasswordController.dispose();
+    registerConfirmPasswordController.dispose();
     super.onClose();
   }
 }

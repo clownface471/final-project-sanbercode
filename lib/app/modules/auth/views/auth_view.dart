@@ -13,67 +13,89 @@ class AuthView extends GetView<AuthController> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-          child: Obx(
-            () => Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Center(
-                  child: Text(
-                    "ARCHI",
-                    style: TextStyle(
-                      color: Color(0xFF36454F),
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                    ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Center(
+                child: Text(
+                  "ARCHI",
+                  style: TextStyle(
+                    color: Color(0xFF36454F),
+                    fontSize: 48,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 60),
-
-                // Email Field
-                _buildTextField(
-                  controller: controller.emailController,
-                  hint: 'youremail@example.com',
-                  label: 'Email',
-                ),
-                const SizedBox(height: 20),
-
-                // Password Field
-                _buildTextField(
-                  controller: controller.passwordController,
-                  hint: 'Password',
-                  label: 'Password',
-                  isPassword: true,
-                ),
-                const SizedBox(height: 20),
-                
-                // Confirm Password Field (hanya tampil saat register)
-                if (!controller.isLogin.value)
-                  _buildTextField(
-                    controller: controller.confirmPasswordController,
-                    hint: 'Confirm Password',
-                    label: 'Confirm Password',
-                    isPassword: true,
-                  ),
-                if (!controller.isLogin.value) const SizedBox(height: 40),
-
-                // Tombol Aksi (Login/Register)
-                _buildAuthButton(),
-                const SizedBox(height: 24),
-
-                // Teks untuk beralih mode
-                _buildToggleText(),
-              ],
-            ),
+              ),
+              const SizedBox(height: 60),
+              
+              // Tampilkan form Login atau Register berdasarkan state
+              Obx(() => controller.isLoginView.value ? _buildLoginForm() : _buildRegisterForm()),
+              
+              const SizedBox(height: 24),
+              _buildToggleText(),
+            ],
           ),
         ),
       ),
     );
   }
 
+  // Widget untuk Form Login
+  Widget _buildLoginForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildTextField(
+          controller: controller.loginInputController,
+          label: 'Email atau Username',
+        ),
+        const SizedBox(height: 20),
+        _buildTextField(
+          controller: controller.loginPasswordController,
+          label: 'Password',
+          isPassword: true,
+        ),
+        const SizedBox(height: 40),
+        _buildAuthButton(isLogin: true),
+      ],
+    );
+  }
+
+  // Widget untuk Form Register
+  Widget _buildRegisterForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildTextField(
+          controller: controller.registerUsernameController,
+          label: 'Username',
+        ),
+        const SizedBox(height: 20),
+        _buildTextField(
+          controller: controller.registerEmailController,
+          label: 'Email',
+        ),
+        const SizedBox(height: 20),
+        _buildTextField(
+          controller: controller.registerPasswordController,
+          label: 'Password',
+          isPassword: true,
+        ),
+        const SizedBox(height: 20),
+        _buildTextField(
+          controller: controller.registerConfirmPasswordController,
+          label: 'Confirm Password',
+          isPassword: true,
+        ),
+        const SizedBox(height: 40),
+        _buildAuthButton(isLogin: false),
+      ],
+    );
+  }
+
   Widget _buildTextField({
     required TextEditingController controller,
-    required String hint,
     required String label,
     bool isPassword = false,
   }) {
@@ -82,7 +104,6 @@ class AuthView extends GetView<AuthController> {
       obscureText: isPassword,
       decoration: InputDecoration(
         labelText: label,
-        hintText: hint,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: Color(0xFFB2BEB5)),
@@ -95,18 +116,12 @@ class AuthView extends GetView<AuthController> {
     );
   }
 
-  Widget _buildAuthButton() {
+  Widget _buildAuthButton({required bool isLogin}) {
     return Obx(
       () => ElevatedButton(
-        onPressed: controller.isLoading.value
-            ? null
-            : () {
-                if (controller.isLogin.value) {
-                  controller.login();
-                } else {
-                  controller.register();
-                }
-              },
+        onPressed: controller.isLoading.value ? null : () {
+          isLogin ? controller.login() : controller.register();
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF36454F),
           foregroundColor: Colors.white,
@@ -117,41 +132,39 @@ class AuthView extends GetView<AuthController> {
         ),
         child: controller.isLoading.value
             ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
+                height: 20, width: 20,
+                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
               )
-            : Text(controller.isLogin.value ? 'Login' : 'Register'),
+            : Text(isLogin ? 'Login' : 'Register'),
       ),
     );
   }
 
   Widget _buildToggleText() {
     return Center(
-      child: RichText(
-        text: TextSpan(
-          style: const TextStyle(color: Colors.black54, fontSize: 14),
-          children: [
-            TextSpan(
-              text: controller.isLogin.value
-                  ? "Don't have an account? "
-                  : "Already have an account? ",
-            ),
-            TextSpan(
-              text: controller.isLogin.value ? 'Register here' : 'Login here',
-              style: const TextStyle(
-                color: Color(0xFF36454F),
-                fontWeight: FontWeight.bold,
+      child: Obx(
+        () => RichText(
+          text: TextSpan(
+            style: const TextStyle(color: Colors.black54, fontSize: 14),
+            children: [
+              TextSpan(
+                text: controller.isLoginView.value
+                    ? "Don't have an account? "
+                    : "Already have an account? ",
               ),
-              recognizer: TapGestureRecognizer()
-                ..onTap = () {
-                  controller.isLogin.value = !controller.isLogin.value;
-                },
-            ),
-          ],
+              TextSpan(
+                text: controller.isLoginView.value ? 'Register here' : 'Login here',
+                style: const TextStyle(
+                  color: Color(0xFF36454F),
+                  fontWeight: FontWeight.bold,
+                ),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    controller.isLoginView.value = !controller.isLoginView.value;
+                  },
+              ),
+            ],
+          ),
         ),
       ),
     );

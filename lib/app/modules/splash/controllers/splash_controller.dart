@@ -12,15 +12,10 @@ class SplashController extends GetxController {
   }
 
   Future<void> _initializeApp() async {
-    // Beri jeda 3 detik untuk menampilkan splash screen
     await Future.delayed(const Duration(seconds: 3));
-
-    // Cek status autentikasi pengguna
     if (_auth.currentUser != null) {
-      // Jika pengguna sudah login, arahkan ke halaman home
       Get.offAllNamed(Routes.HOME);
     } else {
-      // Jika belum login, arahkan ke halaman autentikasi
       Get.offAllNamed(Routes.AUTH);
     }
   }

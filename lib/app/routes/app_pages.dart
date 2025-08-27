@@ -44,6 +44,11 @@ class AppPages {
       binding: NoteEditorBinding(),
     ),
     GetPage(
+      name: '${Routes.NOTE_EDITOR}/:id',
+      page: () => const NoteEditorView(),
+      binding: NoteEditorBinding(),
+    ),
+    GetPage(
       name: Routes.PROFILE,
       page: () => const ProfileView(),
       binding: ProfileBinding(),

@@ -13,7 +13,6 @@ class NoteModel {
     required this.createdAt,
   });
 
-  // Factory constructor untuk membuat instance NoteModel dari dokumen Firestore
   factory NoteModel.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return NoteModel(
@@ -24,7 +23,6 @@ class NoteModel {
     );
   }
 
-  // Method untuk mengubah instance NoteModel menjadi Map agar bisa disimpan ke Firestore
   Map<String, dynamic> toFirestore() {
     return {
       'title': title,
