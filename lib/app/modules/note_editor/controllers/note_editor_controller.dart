@@ -70,19 +70,19 @@ class NoteEditorController extends GetxController {
 
   Future<void> generateSummary() async {
   await _runAI(
-    "Ringkas teks berikut agar lebih singkat dan jelas:\n\n${contentController.text}",
+    "Summarize the following text in a concise, single paragraph. The summary must be in the same language as the original text:\n\n${contentController.text}",
   );
 }
 
 Future<void> generateContinuation() async {
   await _runAI(
-    "Lanjutkan teks berikut dengan ide kreatif dan relevan:\n\n${contentController.text}",
+    "You are a helpful AI assistant. Your task is to generate a paragraph of text that is relevant to the user's provided input. The generated text must be in the same language as the original user input:\n\n${contentController.text}",
   );
 }
 
 Future<void> fixText() async {
   await _runAI(
-    "Perbaiki teks berikut agar tata bahasa, ejaan, dan strukturnya lebih baik tanpa mengubah makna:\n\n${contentController.text}",
+    "Review and correct the following text for any grammatical errors, spelling mistakes, or awkward phrasing. The corrected text must be in the same language as the original text. Do not change the overall meaning:\n\n${contentController.text}",
   );
 }
 
