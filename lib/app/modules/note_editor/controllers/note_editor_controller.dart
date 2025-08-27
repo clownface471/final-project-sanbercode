@@ -1,3 +1,4 @@
+import 'package:final_project_sanbercode/app/data/services/ai_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:final_project_sanbercode/app/data/models/note_model.dart';
@@ -7,7 +8,9 @@ class NoteEditorController extends GetxController {
   final FirestoreService _firestoreService = FirestoreService();
   final titleController = TextEditingController();
   final contentController = TextEditingController();
-
+  
+  var isLoading = false.obs;
+  var summarizedText = ''.obs;
   // Variabel untuk menampung note yang sedang diedit (jika ada)
   NoteModel? existingNote;
 
@@ -62,6 +65,45 @@ class NoteEditorController extends GetxController {
           Get.snackbar("Sukses", "Catatan berhasil dihapus.");
         },
       );
+    }
+  }
+
+  Future<void> generateSummary() async {
+  await _runAI(
+    "Ringkas teks berikut agar lebih singkat dan jelas:\n\n${contentController.text}",
+  );
+}
+
+Future<void> generateContinuation() async {
+  await _runAI(
+    "Lanjutkan teks berikut dengan ide kreatif dan relevan:\n\n${contentController.text}",
+  );
+}
+
+Future<void> fixText() async {
+  await _runAI(
+    "Perbaiki teks berikut agar tata bahasa, ejaan, dan strukturnya lebih baik tanpa mengubah makna:\n\n${contentController.text}",
+  );
+}
+
+  Future<void> _runAI(String prompt) async{
+    try {
+      
+      isLoading.value = true;
+      final result = await AIService.generateText(prompt);
+      summarizedText.value = result;
+
+      Get.defaultDialog(
+        title: 'Hasil AI',
+        middleText: result,
+        textConfirm: 'OK',
+        onConfirm: () => Get.back(),
+      );
+
+    } catch (e) {
+      Get.snackbar("Error", "Gagal menghasilkan teks AI");
+    } finally {
+      isLoading.value = false;
     }
   }
 
