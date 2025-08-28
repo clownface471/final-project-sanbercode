@@ -12,25 +12,21 @@ class NoteEditorController extends GetxController {
 
   NoteModel? existingNote;
   var isAiLoading = false.obs;
-  // State untuk menandakan jika data sedang dimuat dari URL
   var isLoadingNote = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    // Cek apakah ada note yang dikirim sebagai argumen (dari navigasi normal)
     if (Get.arguments != null) {
       existingNote = Get.arguments as NoteModel;
       titleController.text = existingNote!.title;
       contentController.text = existingNote!.content;
     } else if (Get.parameters['id'] != null) {
-      // Jika tidak ada argumen, cek parameter URL (untuk kasus refresh web)
       final noteId = Get.parameters['id']!;
       loadNoteFromId(noteId);
     }
   }
 
-  // Fungsi untuk memuat data dari Firestore berdasarkan ID
   Future<void> loadNoteFromId(String id) async {
     isLoadingNote.value = true;
     try {
@@ -41,16 +37,14 @@ class NoteEditorController extends GetxController {
         contentController.text = note.content;
       } else {
         Get.snackbar("Error", "Catatan tidak ditemukan.");
-        Get.offAllNamed(Routes.HOME); // Kembali ke home jika catatan tidak ada
+        Get.offAllNamed(Routes.HOME);
       }
     } finally {
       isLoadingNote.value = false;
     }
   }
 
-  // FUNGSI BARU: Logika untuk tombol kembali
   void handleBackButton() {
-    // Cek jika ada perubahan yang belum disimpan
     bool hasChanges = false;
     if (existingNote != null) {
       if (titleController.text != existingNote!.title ||
