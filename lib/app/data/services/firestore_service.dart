@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -78,12 +80,24 @@ class FirestoreService {
     return null;
   }
 
-  Future<String> uploadProfilePicture(File image) async {
-    final user = _auth.currentUser;
-    if (user == null) throw Exception("User not logged in");
-    final storageRef = _storage.ref().child('profile_pictures').child(user.uid);
-    final uploadTask = await storageRef.putFile(image);
-    return await uploadTask.ref.getDownloadURL();
+  Future<String> uploadProfilePicture(XFile imageFile) async {
+      final user = _auth.currentUser;
+      if (user == null) throw Exception("User not logged in");
+
+      final storageRef = _storage.ref().child('profile_pictures').child(user.uid);
+
+      // Cek jika platform adalah web
+      if (kIsWeb) {
+          // Gunakan putData untuk web
+          final imageData = await imageFile.readAsBytes();
+          final uploadTask = await storageRef.putData(imageData);
+          return await uploadTask.ref.getDownloadURL();
+      } else {
+          // Gunakan putFile untuk mobile (Android/iOS)
+          final file = File(imageFile.path);
+          final uploadTask = await storageRef.putFile(file);
+          return await uploadTask.ref.getDownloadURL();
+      }
   }
 
   Future<void> updateUserProfile(String username, String? photoUrl) async {

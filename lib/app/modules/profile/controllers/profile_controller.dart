@@ -1,4 +1,7 @@
-import 'dart:io';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
@@ -33,14 +36,41 @@ class ProfileController extends GetxController {
 
   Future<void> pickImageAndUpdateProfile() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1024,
+      maxHeight: 1024,
+      imageQuality: 80,
+    );
 
     if (image != null) {
       isLoading.value = true;
       try {
-        final photoUrl = await _firestoreService.uploadProfilePicture(File(image.path));
+        XFile imageToUpload = image; // Siapkan file untuk diunggah
+
+        // HANYA LAKUKAN KOMPRESI JIKA PLATFORM BUKAN WEB
+        if (!kIsWeb) {
+          // --- BLOK KOMPRESI HANYA UNTUK MOBILE ---
+          final tempDir = await getTemporaryDirectory();
+          final targetPath = p.join(tempDir.path, '${DateTime.now().millisecondsSinceEpoch}.jpg');
+
+          final XFile? compressedImage = await FlutterImageCompress.compressAndGetFile(
+            image.path,
+            targetPath,
+            quality: 70,
+          );
+          
+          if (compressedImage != null) {
+            imageToUpload = compressedImage; // Gunakan gambar terkompresi jika berhasil
+          }
+          // --- SELESAI BLOK KOMPRESI ---
+        }
+
+        // Unggah gambar (versi kompresi di mobile, versi asli di web)
+        final photoUrl = await _firestoreService.uploadProfilePicture(imageToUpload);
         await _firestoreService.updateUserProfile(userProfile.value.username, photoUrl);
         Get.snackbar("Sukses", "Foto profil berhasil diperbarui.");
+
       } catch (e) {
         Get.snackbar("Error", "Gagal mengunggah foto: ${e.toString()}");
       } finally {
