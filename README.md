@@ -17,7 +17,7 @@ Aplikasi ini memungkinkan pengguna untuk membuat akun, login, dan mengelola cata
 2.  **Lanjutkan Teks:** Memberikan saran kelanjutan tulisan secara natural berdasarkan konteks yang sudah ada.
 3.  **Perbaiki Tata Bahasa:** Mengoreksi kesalahan ejaan dan tata bahasa untuk menyempurnakan tulisan.
 
-Selain itu, pengguna dapat mempersonalisasi profil mereka dengan mengubah nama pengguna dan foto profil.
+Selain itu, pengguna dapat mempersonalisasi profil mereka dengan mengubah nama pengguna.
 
 ---
 
@@ -36,7 +36,7 @@ Selain itu, pengguna dapat mempersonalisasi profil mereka dengan mengubah nama p
 * **Otentikasi Pengguna:** Sistem registrasi dan login yang aman menggunakan Firebase Authentication (Email/Password & Username).
 * **Manajemen Catatan (CRUD):** Membuat, membaca, memperbarui, dan menghapus catatan.
 * **Editor Teks Cerdas:** Dilengkapi dengan 3 fitur AI untuk membantu penulisan.
-* **Manajemen Profil:** Pengguna dapat mengubah nama pengguna dan foto profil.
+* **Manajemen Profil:** Pengguna dapat mengubah nama pengguna.
 * **UI Responsif:** Tampilan yang bersih dan dapat beradaptasi untuk platform mobile dan web.
 * **Penyimpanan Real-time:** Semua data disinkronkan secara instan menggunakan Cloud Firestore.
 

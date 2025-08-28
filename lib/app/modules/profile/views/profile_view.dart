@@ -38,20 +38,14 @@ class ProfileView extends GetView<ProfileController> {
                   const SizedBox(height: 20),
                   Column(
                     children: [
-                      GestureDetector(
-                        onTap: () => controller.pickImageAndUpdateProfile(),
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundColor: const Color(0xFFB2BEB5),
-                          backgroundImage: controller.userProfile.value.photoUrl != null
-                              ? NetworkImage(controller.userProfile.value.photoUrl!)
-                              : null,
-                          child: controller.userProfile.value.photoUrl == null
-                              ? Text(
-                                  controller.userProfile.value.username.substring(0, 1).toUpperCase(),
-                                  style: const TextStyle(fontSize: 48, color: Color(0xFF36454F), fontWeight: FontWeight.bold),
-                                )
-                              : null,
+                      CircleAvatar(
+                        radius: 50,
+                        backgroundColor: const Color(0xFFB2BEB5),
+                        child: Text(
+                          controller.userProfile.value.username.isNotEmpty
+                              ? controller.userProfile.value.username.substring(0, 1).toUpperCase()
+                              : '?',
+                          style: const TextStyle(fontSize: 48, color: Color(0xFF36454F), fontWeight: FontWeight.bold),
                         ),
                       ),
                       const SizedBox(height: 16),
