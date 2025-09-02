@@ -1,4 +1,3 @@
-// Tambahkan import ini di baris paling atas
 import java.util.Properties
 import java.io.FileInputStream
 

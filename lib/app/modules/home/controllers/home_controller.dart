@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import '../../../data/models/note_model.dart';
@@ -22,12 +23,34 @@ class HomeController extends GetxController {
   }
 
   void goToEditPage(NoteModel note) {
-    // Navigasi dengan menyertakan ID di URL
     Get.toNamed('${Routes.NOTE_EDITOR}/${note.id}');
   }
   
   void goToProfilePage() {
     Get.toNamed(Routes.PROFILE);
+  }
+
+  Future<void> deleteNoteFromHome(String noteId) async {
+    try {
+      await _firestoreService.deleteNote(noteId);
+      Get.snackbar(
+        "Sukses",
+        "Catatan berhasil dihapus.",
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(12), 
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        "Gagal menghapus catatan: $e",
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(12), 
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 
   void logout() async {
