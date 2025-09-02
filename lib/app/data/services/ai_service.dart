@@ -4,7 +4,7 @@ import 'package:final_project_sanbercode/app/data/services/api_keys.dart';
 
 class AIService {
   static const String _baseUrl =
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
   static Future<String> generateText(String prompt) async {
     try {

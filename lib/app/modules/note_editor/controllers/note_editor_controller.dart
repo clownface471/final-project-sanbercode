@@ -24,7 +24,7 @@ class NoteEditorController extends GetxController {
     } else if (Get.parameters['id'] != null) {
       final noteId = Get.parameters['id']!;
       loadNoteFromId(noteId);
-    }
+    } 
   }
 
   Future<void> loadNoteFromId(String id) async {
