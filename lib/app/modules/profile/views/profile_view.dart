@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../controllers/theme_controller.dart'; // Pastikan ini di-import
 import '../controllers/profile_controller.dart';
 
 class ProfileView extends GetView<ProfileController> {
@@ -8,20 +9,33 @@ class ProfileView extends GetView<ProfileController> {
   @override
   Widget build(BuildContext context) {
     final usernameEditController = TextEditingController();
+    // Panggil ThemeController langsung dari view
+    final ThemeController themeController = Get.find();
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 1,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF36454F)),
+          icon: const Icon(Icons.arrow_back),
+          // Get.back() akan berfungsi setelah error di-resolve
           onPressed: () => Get.back(),
         ),
-        title: const Text(
-          'My Profile',
-          style: TextStyle(color: Color(0xFF36454F), fontWeight: FontWeight.bold),
-        ),
+        title: const Text('My Profile'),
+        actions: [
+          Obx(() => IconButton(
+                icon: Icon(
+                  themeController.isDarkMode.value
+                      ? Icons.wb_sunny
+                      : Icons.nightlight_round,
+                ),
+                onPressed: () {
+                  // Panggil fungsi langsung dari themeController
+                  themeController.switchTheme();
+                },
+                tooltip: 'Ubah Tema',
+              )),
+        ],
       ),
+      // ... sisa kode tidak perlu diubah, sudah benar dari perbaikan sebelumnya ...
       body: Obx(() {
         if (controller.userProfile.value.uid.isEmpty) {
           return const Center(child: CircularProgressIndicator());
@@ -40,21 +54,36 @@ class ProfileView extends GetView<ProfileController> {
                     children: [
                       CircleAvatar(
                         radius: 50,
-                        backgroundColor: const Color(0xFFB2BEB5),
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
                         child: Text(
                           controller.userProfile.value.username.isNotEmpty
-                              ? controller.userProfile.value.username.substring(0, 1).toUpperCase()
+                              ? controller.userProfile.value.username
+                                  .substring(0, 1)
+                                  .toUpperCase()
                               : '?',
-                          style: const TextStyle(fontSize: 48, color: Color(0xFF36454F), fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 48,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            controller.userProfile.value.username,
-                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          Flexible(
+                            child: Text(
+                              controller.userProfile.value.username,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                           IconButton(
                             icon: const Icon(Icons.edit, size: 20),
@@ -67,7 +96,8 @@ class ProfileView extends GetView<ProfileController> {
                                 ),
                                 textConfirm: "Simpan",
                                 textCancel: "Batal",
-                                onConfirm: () => controller.updateUsername(usernameEditController.text),
+                                onConfirm: () => controller
+                                    .updateUsername(usernameEditController.text),
                               );
                             },
                           ),
@@ -75,35 +105,34 @@ class ProfileView extends GetView<ProfileController> {
                       ),
                       Text(
                         controller.userProfile.value.email,
-                        style: const TextStyle(fontSize: 16, color: Colors.grey),
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                     ],
                   ),
                   const SizedBox(height: 40),
                   Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Row(
                         children: [
-                          const Icon(Icons.note_alt_outlined, color: Color(0xFF36454F)),
+                          Icon(Icons.note_alt_outlined,
+                              color: Theme.of(context).colorScheme.primary),
                           const SizedBox(width: 16),
                           const Text("Total Notes Created"),
                           const Spacer(),
-                          Text(
-                            controller.noteCount.value.toString(),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
+                          Obx(() => Text(
+                                controller.noteCount.value.toString(),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              )),
                         ],
                       ),
                     ),
                   ),
                   const Spacer(),
                   ElevatedButton(
-                    onPressed: () {
-                      controller.logout();
-                    },
+                    onPressed: () => controller.logout(),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF36454F),
                       foregroundColor: Colors.white,
@@ -118,11 +147,14 @@ class ProfileView extends GetView<ProfileController> {
                 ],
               ),
             ),
-            if (controller.isLoading.value)
-              Container(
-                color: Colors.black.withAlpha(128),
-                child: const Center(child: CircularProgressIndicator(color: Colors.white)),
-              ),
+            Obx(() => controller.isLoading.value
+                ? Container(
+                    color: Colors.black.withOpacity(0.5),
+                    child: const Center(
+                      child: CircularProgressIndicator(color: Colors.white),
+                    ),
+                  )
+                : const SizedBox.shrink()),
           ],
         );
       }),

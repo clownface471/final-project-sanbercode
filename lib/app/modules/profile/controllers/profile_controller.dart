@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+// Hapus import 'theme_controller.dart' karena sudah tidak digunakan di sini
 import '../../../data/models/user_profile_model.dart';
 import '../../../data/services/firestore_service.dart';
 import '../../../routes/app_pages.dart';
@@ -9,10 +10,14 @@ class ProfileController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirestoreService _firestoreService = FirestoreService();
 
+  // --- HAPUS BAGIAN INI ---
+  // final ThemeController themeController = Get.find();
+  // -------------------------
+
   var userProfile = UserProfileModel(
     uid: '', email: '', username: 'Loading...', createdAt: Timestamp.now()
   ).obs;
-  
+
   var noteCount = 0.obs;
   var isLoading = false.obs;
 

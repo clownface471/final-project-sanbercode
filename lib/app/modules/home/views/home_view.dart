@@ -10,15 +10,10 @@ class HomeView extends GetView<HomeController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'My Notes',
-          style: TextStyle(color: Color(0xFF36454F), fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 1,
+        title: const Text('My Notes'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.person_outline, color: Color(0xFF36454F)),
+            icon: const Icon(Icons.person_outline),
             onPressed: () {
               controller.goToProfilePage();
             },
@@ -36,7 +31,10 @@ class HomeView extends GetView<HomeController> {
                   SizedBox(height: 16),
                   Text(
                     "No Notes Yet",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.grey),
+                    style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey),
                   ),
                   SizedBox(height: 8),
                   Text(
@@ -47,53 +45,47 @@ class HomeView extends GetView<HomeController> {
               ),
             );
           }
-          // --- PERUBAHAN UTAMA DIMULAI DARI SINI ---
           return ListView.builder(
             padding: const EdgeInsets.all(8),
             itemCount: controller.notes.length,
             itemBuilder: (context, index) {
               final note = controller.notes[index];
               return Dismissible(
-                key: Key(note.id!), // Key unik wajib ada untuk Dismissible
-                direction: DismissDirection.endToStart, // Arah swipe (kanan ke kiri)
-                
-                // Tampilan latar belakang saat item di-swipe
+                key: Key(note.id!),
+                direction: DismissDirection.endToStart,
                 background: Container(
                   color: Colors.redAccent,
-                  margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   alignment: Alignment.centerRight,
                   child: const Icon(Icons.delete, color: Colors.white),
                 ),
-
-                // Fungsi konfirmasi sebelum item benar-benar dihapus
+                // --- PERBAIKAN DI SINI ---
                 confirmDismiss: (direction) async {
+                  // Tambahkan onConfirm dan onCancel
                   return await Get.defaultDialog<bool>(
                     title: "Hapus Catatan",
-                    middleText: "Apakah Anda yakin ingin menghapus catatan ini?",
+                    middleText:
+                        "Apakah Anda yakin ingin menghapus catatan ini?",
                     textConfirm: "Ya, Hapus",
                     textCancel: "Batal",
-                    confirmTextColor: Colors.white,
-                    buttonColor: const Color(0xFF36454F),
-                    cancelTextColor: const Color(0xFF36454F),
+                    // Ini akan mengembalikan 'true' saat ditekan
                     onConfirm: () => Get.back(result: true),
+                    // Ini akan mengembalikan 'false' saat ditekan
                     onCancel: () => Get.back(result: false),
                   );
                 },
-
-                // Fungsi yang dijalankan setelah item di-swipe dan dikonfirmasi
+                // -------------------------
                 onDismissed: (direction) {
                   controller.deleteNoteFromHome(note.id!);
                 },
-
-                // Widget asli yang ditampilkan (Card catatan)
                 child: Card(
-                  elevation: 2,
-                  margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                    title: Text(note.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 16),
+                    title: Text(note.title,
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -105,8 +97,11 @@ class HomeView extends GetView<HomeController> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          DateFormat.yMMMd().add_jm().format(note.createdAt.toDate()),
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          DateFormat.yMMMd()
+                              .add_jm()
+                              .format(note.createdAt.toDate()),
+                          style: const TextStyle(
+                              fontSize: 12, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -118,15 +113,13 @@ class HomeView extends GetView<HomeController> {
               );
             },
           );
-          // --- AKHIR DARI PERUBAHAN UTAMA ---
         },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           controller.goToAddPage();
         },
-        backgroundColor: const Color(0xFF36454F),
-        child: const Icon(Icons.add, color: Colors.white),
+        child: const Icon(Icons.add),
       ),
     );
   }

@@ -9,42 +9,34 @@ class NoteEditorView extends GetView<NoteEditorController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 1,
-        // Menggunakan fungsi handleBackButton yang baru untuk logika kembali yang aman
+        // Tidak perlu lagi mendefinisikan warna AppBar
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF36454F)),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => controller.handleBackButton(),
         ),
         actions: [
-          // Tampilkan tombol hapus hanya jika sedang mengedit catatan yang sudah ada
           if (controller.existingNote != null)
             IconButton(
-              icon: const Icon(Icons.delete_outline, color: Color(0xFF36454F)),
+              icon: const Icon(Icons.delete_outline),
               onPressed: () {
                 controller.deleteNote();
               },
             ),
-          // Tombol untuk menyimpan catatan
           IconButton(
-            icon: const Icon(Icons.check, color: Color(0xFF36454F)),
+            icon: const Icon(Icons.check),
             onPressed: () {
               controller.saveNote();
             },
           ),
         ],
       ),
-      // Bungkus body dengan Obx untuk menangani status loading saat refresh di web
       body: Obx(() {
-        // Tampilkan loading jika sedang memuat data dari URL
         if (controller.isLoadingNote.value) {
           return const Center(child: CircularProgressIndicator());
         }
-        // Tampilkan editor setelah data siap
         return Stack(
           children: [
             Padding(
-              // Beri ruang di bawah agar tidak tertutup panel AI
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
               child: Column(
                 children: [
@@ -53,7 +45,8 @@ class NoteEditorView extends GetView<NoteEditorController> {
                     decoration: const InputDecoration.collapsed(
                       hintText: "Note Title...",
                     ),
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
                   Expanded(
@@ -62,14 +55,13 @@ class NoteEditorView extends GetView<NoteEditorController> {
                       decoration: const InputDecoration.collapsed(
                         hintText: "Start writing here...",
                       ),
-                      maxLines: null, // Memungkinkan input multiline
-                      expands: true, // Memenuhi ruang yang tersedia
+                      maxLines: null,
+                      expands: true,
                     ),
                   ),
                 ],
               ),
             ),
-            // Tampilkan overlay loading jika AI sedang bekerja
             if (controller.isAiLoading.value)
               Container(
                 color: Colors.black.withOpacity(0.5),
@@ -77,32 +69,22 @@ class NoteEditorView extends GetView<NoteEditorController> {
                   child: CircularProgressIndicator(color: Colors.white),
                 ),
               ),
-            // Tampilkan panel AI di bagian bawah
-            _buildAiPanel(),
+            _buildAiPanel(context), // <-- Kirim context ke build panel
           ],
         );
       }),
     );
   }
 
-  // Helper widget untuk membangun panel AI
-  Widget _buildAiPanel() {
+  Widget _buildAiPanel(BuildContext context) { // <-- Terima context
     return Positioned(
       bottom: 0,
       left: 0,
       right: 0,
       child: Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
-              spreadRadius: 2,
-              blurRadius: 5,
-            ),
-          ],
-        ),
+        // Gunakan warna dari tema
+        color: Theme.of(context).cardColor,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -133,12 +115,12 @@ class NoteEditorView extends GetView<NoteEditorController> {
     );
   }
 
-  // Helper widget untuk membangun setiap tombol AI
   Widget _buildAiButton({
     required IconData icon,
     required String label,
     required VoidCallback onPressed,
   }) {
+    // Tombol AI bisa tetap sama, warnanya akan mengikuti tema
     return InkWell(
       onTap: onPressed,
       borderRadius: BorderRadius.circular(8),
@@ -147,11 +129,11 @@ class NoteEditorView extends GetView<NoteEditorController> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: const Color(0xFF36454F)),
+            Icon(icon),
             const SizedBox(height: 4),
             Text(
               label,
-              style: const TextStyle(fontSize: 12, color: Color(0xFF36454F)),
+              style: const TextStyle(fontSize: 12),
               textAlign: TextAlign.center,
             ),
           ],
